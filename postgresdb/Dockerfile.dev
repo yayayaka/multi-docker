@@ -1,0 +1,2 @@
+FROM postgres:latest
+RUN -e POSTGRES_PASSWORD=password
