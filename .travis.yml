@@ -1,0 +1,22 @@
+sudo: required
+services:
+    - docker
+    
+before_install:
+    - docker build -t yayayaka/react-test -f ./client/Dockerfile.dev ./client
+    
+script:
+    - docker run yayayaka/react-test npm test -- --coverage
+
+after_success:
+    - docker build -t yayayaka/multi-client ./client
+    - docker build -t yayayaka/multi-nginx ./nginx
+    - docker build -t yayayaka/multi-server ./server
+    - docker build -t yayayaka/multi-worker ./worker
+    # Log in to the docker CLI
+    - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+    # Take those images and push them to docker hub
+    - docker push yayayaka/multi-client
+    - docker push yayayaka/multi-nginx
+    - docker push yayayaka/multi-server
+    - docker push yayayaka/multi-worker
